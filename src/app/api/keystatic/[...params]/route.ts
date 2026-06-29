@@ -10,7 +10,6 @@ function withStableOrigin(request: Request): Request {
   const stable = new URL(siteUrl);
   url.protocol = stable.protocol;
   url.host = stable.host;
-  // Also override forwarded headers Netlify may inject
   const headers = new Headers(request.headers);
   headers.set('x-forwarded-host', stable.host);
   headers.set('x-forwarded-proto', stable.protocol.replace(':', ''));
@@ -20,22 +19,34 @@ function withStableOrigin(request: Request): Request {
 
 export async function GET(request: Request) {
   const modifiedRequest = withStableOrigin(request);
+
+  // Intercept GitHub token exchange to capture the raw response
+  let githubRaw: string | null = null;
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const res = await originalFetch(input, init);
+    if (String(input).includes('github.com/login/oauth/access_token')) {
+      githubRaw = await res.clone().text();
+    }
+    return res;
+  };
+
   try {
     const response = await handler.GET(modifiedRequest);
-    const location = response.headers.get('location') ?? '';
-    // Intercept error redirects and show details in browser for debugging
-    if (location.includes('error') || response.status >= 400) {
-      const body = await response.text().catch(() => '(no body)');
+    globalThis.fetch = originalFetch;
+
+    if (githubRaw) {
       return new Response(
-        `<pre style="padding:2rem;font-family:monospace;white-space:pre-wrap">STATUS: ${response.status}\nLOCATION: ${location}\nREQUEST URL: ${modifiedRequest.url}\nBODY: ${body}</pre>`,
+        `<pre style="padding:2rem;font-family:monospace;white-space:pre-wrap">KEYSTATIC STATUS: ${response.status}\nGITHUB RESPONSE: ${githubRaw}\nREQUEST URL: ${modifiedRequest.url}</pre>`,
         { status: 200, headers: { 'Content-Type': 'text/html' } }
       );
     }
     return response;
   } catch (error) {
+    globalThis.fetch = originalFetch;
     const message = error instanceof Error ? error.message : String(error);
     return new Response(
-      `<pre style="padding:2rem;font-family:monospace">EXCEPTION:\n${message}</pre>`,
+      `<pre style="padding:2rem;font-family:monospace">EXCEPTION: ${message}</pre>`,
       { status: 500, headers: { 'Content-Type': 'text/html' } }
     );
   }
@@ -48,7 +59,7 @@ export async function POST(request: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return new Response(
-      `<pre style="padding:2rem;font-family:monospace">POST EXCEPTION:\n${message}</pre>`,
+      `<pre style="padding:2rem;font-family:monospace">POST ERROR: ${message}</pre>`,
       { status: 500, headers: { 'Content-Type': 'text/html' } }
     );
   }
