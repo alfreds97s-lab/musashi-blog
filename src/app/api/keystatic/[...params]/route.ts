@@ -18,49 +18,9 @@ function withStableOrigin(request: Request): Request {
 }
 
 export async function GET(request: Request) {
-  const modifiedRequest = withStableOrigin(request);
-
-  // Intercept GitHub token exchange to capture the raw response
-  let githubRaw: string | null = null;
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-    const res = await originalFetch(input, init);
-    if (String(input).includes('github.com/login/oauth/access_token')) {
-      githubRaw = await res.clone().text();
-    }
-    return res;
-  };
-
-  try {
-    const response = await handler.GET(modifiedRequest);
-    globalThis.fetch = originalFetch;
-
-    if (githubRaw) {
-      return new Response(
-        `<pre style="padding:2rem;font-family:monospace;white-space:pre-wrap">KEYSTATIC STATUS: ${response.status}\nGITHUB RESPONSE: ${githubRaw}\nREQUEST URL: ${modifiedRequest.url}</pre>`,
-        { status: 200, headers: { 'Content-Type': 'text/html' } }
-      );
-    }
-    return response;
-  } catch (error) {
-    globalThis.fetch = originalFetch;
-    const message = error instanceof Error ? error.message : String(error);
-    return new Response(
-      `<pre style="padding:2rem;font-family:monospace">EXCEPTION: ${message}</pre>`,
-      { status: 500, headers: { 'Content-Type': 'text/html' } }
-    );
-  }
+  return handler.GET(withStableOrigin(request));
 }
 
 export async function POST(request: Request) {
-  const modifiedRequest = withStableOrigin(request);
-  try {
-    return await handler.POST(modifiedRequest);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return new Response(
-      `<pre style="padding:2rem;font-family:monospace">POST ERROR: ${message}</pre>`,
-      { status: 500, headers: { 'Content-Type': 'text/html' } }
-    );
-  }
+  return handler.POST(withStableOrigin(request));
 }
