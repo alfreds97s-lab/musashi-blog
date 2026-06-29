@@ -1,0 +1,82 @@
+---
+title: "Getting Started with n8n: Build Your First Automation in 15 Minutes"
+date: "2026-06-28"
+author: "Alfred"
+category: "n8n"
+excerpt: "n8n is the most powerful open-source automation tool available. Here is how to install it and build your first real workflow from scratch."
+published: true
+---
+
+n8n is one of the most powerful automation tools available today — and unlike Zapier or Make.com, you can self-host it completely free. No per-task fees. No data leaving your server. Full control.
+
+In this guide, we will go from zero to a running workflow in under 15 minutes.
+
+## What is n8n?
+
+n8n (pronounced "n-eight-n") is a workflow automation platform that lets you connect apps, services, and APIs using a visual node-based editor. Think of it as LEGO blocks for automation — each block does one thing, and you chain them together to build powerful systems.
+
+It supports over 400 integrations out of the box: Gmail, Slack, Notion, Airtable, HTTP requests, databases, and much more.
+
+## Installing n8n with Docker
+
+The fastest way to get started is with Docker:
+
+```bash
+docker run -it --rm \
+  --name n8n \
+  -p 5678:5678 \
+  -v ~/.n8n:/home/node/.n8n \
+  docker.n8n.io/n8nio/n8n
+```
+
+Then open `http://localhost:5678` in your browser. You will be greeted by the n8n interface.
+
+If you do not have Docker, you can also install via npm:
+
+```bash
+npm install n8n -g
+n8n start
+```
+
+## Your first workflow: Morning weather Slack alert
+
+Let us build something immediately useful. Every morning at 8am, we will:
+
+1. Fetch the current weather for your city via a free API
+2. Format a short message
+3. Send it to a Slack channel
+
+### Step 1: Add a Schedule trigger
+
+Click **+ Add Node**, search for **Schedule Trigger**, and add it. Set it to run every day at 8:00 AM.
+
+### Step 2: Fetch weather data
+
+Add an **HTTP Request** node. Set the method to `GET` and the URL to:
+
+```
+https://wttr.in/YourCity?format=3
+```
+
+This returns a simple one-line weather string like: `London: ⛅ +15°C`
+
+### Step 3: Send to Slack
+
+Add a **Slack** node. Connect your Slack account (n8n will guide you through OAuth), choose your channel, and set the message to the output from the HTTP Request node.
+
+### Step 4: Activate
+
+Click **Save** and toggle the workflow to **Active**. Done. n8n will wake up every morning and send you the weather.
+
+## What makes n8n different
+
+- **Self-hostable**: Your data stays on your machine or server
+- **Open source**: Inspect the code, contribute, fork it
+- **No task limits**: Most SaaS tools charge per automation run — n8n does not
+- **Code when you need it**: Drop into JavaScript or Python nodes for anything the visual editor cannot handle
+
+## Next steps
+
+In the next post, we will go deeper — building a multi-step workflow that monitors an RSS feed, filters items by keyword, and saves them to a Notion database automatically.
+
+Stay sharp.

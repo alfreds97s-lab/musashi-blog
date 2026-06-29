@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-cream: #F5F0E8;
+  --color-cream-dark: #EDE8D8;
+  --color-ink: #1A1A1A;
+  --color-ink-light: #4A4A4A;
+  --color-rust: #8B2500;
+  --color-rust-hover: #A0330A;
+  --font-display: var(--font-playfair);
+  --font-body: var(--font-merriweather);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: #F5F0E8;
+}
+
+body {
+  background-color: #F5F0E8;
+  color: #1A1A1A;
+  font-family: var(--font-merriweather), Georgia, 'Times New Roman', serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair), Georgia, 'Times New Roman', serif;
+}
+
+/* Prose styles for blog post content */
+.prose-newspaper {
+  font-family: var(--font-merriweather), Georgia, serif;
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  color: #1A1A1A;
+  max-width: 100%;
+}
+
+.prose-newspaper h1,
+.prose-newspaper h2,
+.prose-newspaper h3,
+.prose-newspaper h4 {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 700;
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+  line-height: 1.2;
+}
+
+.prose-newspaper h2 {
+  font-size: 1.5rem;
+  border-bottom: 1px solid #1A1A1A;
+  padding-bottom: 0.25rem;
+}
+
+.prose-newspaper h3 {
+  font-size: 1.2rem;
+}
+
+.prose-newspaper p {
+  margin-bottom: 1.4em;
+}
+
+.prose-newspaper a {
+  color: #8B2500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose-newspaper a:hover {
+  color: #A0330A;
+}
+
+.prose-newspaper strong {
+  font-weight: 700;
+}
+
+.prose-newspaper em {
+  font-style: italic;
+}
+
+.prose-newspaper blockquote {
+  border-left: 3px solid #8B2500;
+  padding-left: 1.25rem;
+  margin: 1.75rem 0;
+  font-style: italic;
+  color: #4A4A4A;
+}
+
+.prose-newspaper code {
+  background: #EDE8D8;
+  padding: 0.15rem 0.35rem;
+  border-radius: 2px;
+  font-size: 0.875em;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.prose-newspaper pre {
+  background: #1A1A1A;
+  color: #F5F0E8;
+  padding: 1.25rem;
+  border-radius: 2px;
+  overflow-x: auto;
+  margin: 1.75rem 0;
+}
+
+.prose-newspaper pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.875rem;
+}
+
+.prose-newspaper img {
+  width: 100%;
+  height: auto;
+  margin: 1.75rem 0;
+  border: 1px solid #EDE8D8;
+}
+
+.prose-newspaper ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1.25em;
+}
+
+.prose-newspaper ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1.25em;
+}
+
+.prose-newspaper li {
+  margin-bottom: 0.35em;
+}
+
+.prose-newspaper hr {
+  border: none;
+  border-top: 1px solid #1A1A1A;
+  margin: 2rem 0;
+}
+
+/* Drop cap for first paragraph */
+.prose-newspaper > p:first-of-type::first-letter {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 3.5rem;
+  font-weight: 900;
+  float: left;
+  line-height: 0.75;
+  margin-right: 0.1em;
+  margin-top: 0.1em;
+  color: #1A1A1A;
+}
+
+/* Column dividers */
+.col-divider {
+  border-left: 1px solid #1A1A1A;
+}
+
+/* Ornamental rule */
+.ornament-rule {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ornament-rule::before,
+.ornament-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #1A1A1A;
+}

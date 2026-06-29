@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"/run/media/quocho/New Volume/CODE/newspaper/content/posts\")",
+      "Bash(mkdir -p \"/run/media/quocho/New Volume/CODE/newspaper/src/lib\")",
+      "Bash(mkdir -p \"/run/media/quocho/New Volume/CODE/newspaper/src/components\")",
+      "Bash(mkdir -p \"/run/media/quocho/New Volume/CODE/newspaper/src/app/blog/[slug]\")",
+      "Bash(mkdir -p \"/run/media/quocho/New Volume/CODE/newspaper/src/app/category/[category]\")",
+      "Bash(curl *)",
+      "Bash(gh --version)",
+      "Bash(git --version)",
+      "Bash(gh auth *)"
+    ]
+  }
+}
