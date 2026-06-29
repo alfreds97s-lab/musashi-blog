@@ -10,30 +10,45 @@ function withStableOrigin(request: Request): Request {
   const stable = new URL(siteUrl);
   url.protocol = stable.protocol;
   url.host = stable.host;
-  return new Request(url.toString(), request);
+  // Also override forwarded headers Netlify may inject
+  const headers = new Headers(request.headers);
+  headers.set('x-forwarded-host', stable.host);
+  headers.set('x-forwarded-proto', stable.protocol.replace(':', ''));
+  headers.set('host', stable.host);
+  return new Request(url.toString(), { method: request.method, headers, body: request.body });
 }
 
 export async function GET(request: Request) {
+  const modifiedRequest = withStableOrigin(request);
   try {
-    return await handler.GET(withStableOrigin(request));
+    const response = await handler.GET(modifiedRequest);
+    const location = response.headers.get('location') ?? '';
+    // Intercept error redirects and show details in browser for debugging
+    if (location.includes('error') || response.status >= 400) {
+      const body = await response.text().catch(() => '(no body)');
+      return new Response(
+        `<pre style="padding:2rem;font-family:monospace;white-space:pre-wrap">STATUS: ${response.status}\nLOCATION: ${location}\nREQUEST URL: ${modifiedRequest.url}\nBODY: ${body}</pre>`,
+        { status: 200, headers: { 'Content-Type': 'text/html' } }
+      );
+    }
+    return response;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[Keystatic GET error]', message);
     return new Response(
-      `<pre style="font-family:monospace;padding:2rem">Keystatic error:\n\n${message}</pre>`,
+      `<pre style="padding:2rem;font-family:monospace">EXCEPTION:\n${message}</pre>`,
       { status: 500, headers: { 'Content-Type': 'text/html' } }
     );
   }
 }
 
 export async function POST(request: Request) {
+  const modifiedRequest = withStableOrigin(request);
   try {
-    return await handler.POST(withStableOrigin(request));
+    return await handler.POST(modifiedRequest);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[Keystatic POST error]', message);
     return new Response(
-      `<pre style="font-family:monospace;padding:2rem">Keystatic error:\n\n${message}</pre>`,
+      `<pre style="padding:2rem;font-family:monospace">POST EXCEPTION:\n${message}</pre>`,
       { status: 500, headers: { 'Content-Type': 'text/html' } }
     );
   }
